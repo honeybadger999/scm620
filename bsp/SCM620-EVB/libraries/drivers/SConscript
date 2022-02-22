@@ -1,0 +1,39 @@
+import rtconfig
+Import('RTT_ROOT')
+from building import *
+
+# get current directory
+cwd = GetCurrentDir()
+
+src = Split("""
+lib/SCM63X_7816.c
+lib/SCM63X_ADC.c
+lib/SCM63X_AES.c
+lib/SCM63X_CAN.c
+lib/SCM63X_CLK.c
+lib/SCM63X_CRC.c
+lib/SCM63X_DMA.c
+lib/SCM63X_FLASH.c
+lib/SCM63X_GPIO.c
+lib/SCM63X_I2C.c
+lib/SCM63X_IOCTRL.c
+lib/SCM63X_NFC.c
+lib/SCM63X_PWM.c
+lib/SCM63X_QSPI.c
+lib/SCM63X_RESET.c
+lib/SCM63X_RTC.c
+lib/SCM63X_SCU.c
+lib/SCM63X_SM4.c
+lib/SCM63X_SPI.c
+lib/SCM63X_TIMER.c
+lib/SCM63X_UART.c
+lib/SCM63X_WDT.c
+""")
+
+path =  [cwd]
+path += [cwd + '/lib']
+path += [cwd + '/cmsis']
+
+group = DefineGroup('Libraries', src, depend = [''], CPPPATH = path)
+
+Return('group')

@@ -1,0 +1,170 @@
+menu "Hardware Drivers Config"
+
+config SOC_SCM62X
+    bool
+    select SOC_SERIES_SCM62X
+    default y
+
+menu "Onboard Peripheral Drivers"
+
+endmenu
+
+menu "On-chip Peripheral Drivers"
+
+    config RT_USING_UART0
+		    bool "using uart0"
+		    select RT_USING_SERIAL
+		    default n
+    
+		config RT_USING_UART1
+		    bool "using uart1"
+		    select RT_USING_SERIAL
+		    default n
+		    
+		config RT_USING_UART2
+		    bool "using uart2"
+		    select RT_USING_SERIAL
+		    default n
+		    
+		config RT_USING_UART3
+		    bool "using uart3"
+		    select RT_USING_SERIAL
+		    default y
+		    
+		config RT_USING_UART4
+		    bool "using uart4"
+		    select RT_USING_SERIAL
+		    default n
+		    
+		config RT_USING_UART5
+		    bool "using uart5"
+		    select RT_USING_SERIAL
+		    default n
+		    
+		config RT_USING_UART6
+		    bool "using uart6"
+		    select RT_USING_SERIAL
+		    default n
+		    
+		config RT_USING_UART7
+		    bool "using uart7"
+		    select RT_USING_SERIAL
+		    default n
+		
+	config RT_USING_SPI0
+			bool "using spi0"
+			default n
+	
+		config RT_USING_SPI1
+			bool "using spi1"
+			default n
+		
+		config RT_USING_SPI2
+			bool "using spi2"
+			default n
+		
+		config RT_USING_SPI3
+			bool "using spi3"
+			default n
+			
+		config RT_USING_W25QXX
+		    bool "using w25qxx"
+		    select RT_USING_SPI1
+		    default n
+	
+	config RT_USING_I2C0
+			bool "using i2c0"
+			default n
+	
+		config RT_USING_I2C1
+			bool "using i2c1"
+			default n
+			
+		config RT_USING_I2C2
+			bool "using i2c2"
+			default n
+			
+		config RT_USING_FM24CLXX
+			bool "using fm24clxx"
+			select RT_USING_I2C0
+			default n
+			
+	config RT_USING_HWTIMERA0
+			bool "using hwtimera0"
+			default n
+			
+		config RT_USING_HWTIMERA1
+			bool "using hwtimera1"
+			default n
+			
+		config RT_USING_HWTIMERB0
+			bool "using hwtimerb0"
+			default n
+			
+		config RT_USING_HWTIMERB1
+			bool "using hwtimerb1"
+			default n
+			
+		config RT_USING_HWTIMERC0
+			bool "using hwtimerc0"
+			default n
+			
+		config RT_USING_HWTIMERC1
+			bool "using hwtimerc1"
+			default n
+			
+		config RT_USING_HWTIMERD0
+			bool "using hwtimerd0"
+			default n
+			
+		config RT_USING_HWTIMERd1
+			bool "using hwtimerd1"
+			default n
+			
+	config RT_USING_PWM00
+			bool "using pwm00"
+			default n
+			
+		config RT_USING_PWM01
+			bool "using pwm01"
+			default n
+			
+		config RT_USING_PWM02
+			bool "using pwm02"
+			default n
+			
+		config RT_USING_PWM10
+			bool "using pwm10"
+			default n
+			
+		config RT_USING_PWM11
+			bool "using pwm11"
+			default n
+			
+		config RT_USING_PWM12
+			bool "using pwm12"
+			default n
+	
+	config RT_USING_MAC0
+			bool "using mac0"
+			default n	
+	
+	config RT_USING_MAC1
+			bool "using mac1"
+			default n	
+			
+	config RT_USING_MAC_MII
+			bool "using mac MII"
+			default n	
+    
+	config RT_USING_MAC_RMII
+			bool "using mac RMII"
+			default n
+		
+endmenu
+
+menu "Board extended module Drivers"
+
+endmenu
+ 
+endmenu
