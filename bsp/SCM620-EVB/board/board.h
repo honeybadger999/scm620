@@ -47,16 +47,9 @@ extern int __bss_end;
 #define EVENT_FLAG_RV_UART3 (1 << 3)
 #define EVENT_FLAG_PS_UART7 (1 << 4)
 #define EVENT_FLAG_RV_UART7 (1 << 5)
-
-#define MODBUS_WRITE 0x06
-#define MODBUS_READ 0x03
-#define MODBUS_WRITE10 0x10
-
-struct CRC_TABLE{
- 	uint16_t      TABLE1[256];
- 	uint16_t      TABLE2[256];
-};                              
-extern struct	CRC_TABLE crc_tab;
+extern rt_mailbox_t mb_uart0;
+extern rt_sem_t sem_com_pcs ;
+extern rt_sem_t sem_com_dc ;
 
 void SystemClock_Config(void);
 void rt_hw_board_init(void);

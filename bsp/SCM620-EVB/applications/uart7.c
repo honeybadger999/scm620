@@ -5,17 +5,29 @@
 #include <rtdevice.h>
 #include <dfs_fs.h>
 #include <dfs_file.h>
+#include "LE_uart.h"
 
-#define UART_LEN_MAX 200
 
-UINT8 TxCount = 0;
+uint8_t TxCount = 0;
 rt_uint8_t uart7_stack[256];
 struct rt_thread uart7_thread;
-UINT8 Uart7_rev[UART_LEN_MAX];
-UINT16 Uart7_rev_counter,com7_rxlen;
+uint8_t Uart7_rev[MAX_REV_QUANT];
+uint16_t Uart7_rev_counter,com7_rxlen;
 
-uint8_t  Uart7_Send_Buf[256];
+uint8_t  Uart7_Send_Buf[MAX_SEND_QUANT];
 struct CRC_TABLE crc_tab;
+uint16_t modbus_len,modbus_crc_code;
+
+struct STRUCT_LEUER_Data LEUER_Data;
+struct COM_Info Pcs_ComInfo,DC1_ComInfo,DC2_ComInfo;
+struct DC_Data DC2data;
+
+struct STRUCT_PCS PCSdata;
+
+uint16_t *P_DC2data = ( uint16_t *)&DC2data;	
+uint16_t *P_EMS = ( uint16_t *)&LEUER_Data.EMS_Data;
+uint16_t *P_PCSdata = ( uint16_t *)&PCSdata;
+
 /* 串 口 接 收 消 息 结 构*/
 struct rx_msg
 {
@@ -125,7 +137,7 @@ static void Uart7_Send(const uint8_t *buff,uint8_t len)
 	//	vTaskSuspendAll();
 //    usart_write(7, Uart7_Send_Buf, modbus_len);
 	uint16_t i;
-	GPIO_WrDataOut(58, GPIO_LOW);
+	USART7_TX_EN;
 	Uart7_Delay_nus(2000);
 
 	for (i = 0; i < len; i++)
@@ -134,7 +146,7 @@ static void Uart7_Send(const uint8_t *buff,uint8_t len)
 	}
 
 	Uart7_Delay_nus(5000);  //经过测试  时间设置太短会影响发送  5ms 发送50个字节没问题
-	GPIO_WrDataOut(58, GPIO_HIGH);
+	USART7_RX_EN;
 //	xTaskResumeAll();//恢复调度器
 }
 
@@ -148,18 +160,47 @@ static void Uart7_Send(const uint8_t *buff,uint8_t len)
 static void handle_modbus_03h(uint16_t modbus_add,uint16_t modbus_dataNum)
 {
 	uint16_t i;
-	uint16_t modbus_len,modbus_crc_code;
 
 	Uart7_Send_Buf[0] = Uart7_rev[0];
 	Uart7_Send_Buf[1] = 0x03;
 	Uart7_Send_Buf[2] = modbus_dataNum<<1;
 
 	for(i=0;i<modbus_dataNum;i++)				
-	{
+	{	
 		if((modbus_add>=100)&&(modbus_add<=150))//EMS
 		{
-			Uart7_Send_Buf[3+i*2] = i;//(*(P_EMS-100+modbus_add+i)>>8) & 0x0FF;
-			Uart7_Send_Buf[4+i*2] = i;//*(P_EMS-100+modbus_add+i) & 0x0FF;
+			Uart7_Send_Buf[3+i*2] = (*(P_EMS-100+modbus_add+i)>>8) & 0x0FF;
+			Uart7_Send_Buf[4+i*2] = *(P_EMS-100+modbus_add+i) & 0x0FF;
+		}
+		else if((modbus_add>=151)&&(modbus_add<=153))//
+		{
+	//		Uart7_Send_Buf[3+i*2] =((uint16_t)PVAC_Power[modbus_add-151+i]>>8) & 0x0FF;
+	//		Uart7_Send_Buf[4+i*2] = ((uint16_t)PVAC_Power[modbus_add-151+i]) & 0x0FF;
+		}
+		else if((modbus_add>=160)&&(modbus_add<=166))  //time
+		{
+	//		Uart7_Send_Buf[3+i*2] =(time_uart1[modbus_add-160+i]>>8) & 0x0FF;
+	//		Uart7_Send_Buf[4+i*2] = (time_uart1[modbus_add-160+i]) & 0x0FF;
+		}
+		else if((modbus_add>=170)&&(modbus_add<=183))  //以太网参数 mac ip
+		{
+	//		Uart7_Send_Buf[3+i*2] =(*(P_ethernet+modbus_add-170+i)>>8) & 0x0FF;
+	//		Uart7_Send_Buf[4+i*2] = *(P_ethernet+modbus_add-170+i) & 0x0FF;
+		}
+		else if((modbus_add>=2200)&&(modbus_add<=2282))    // DC2 所有数据读取 
+		{
+			Uart7_Send_Buf[3+i*2] = (*(P_DC2data+modbus_add-2200+i)>>8) & 0x0FF;
+			Uart7_Send_Buf[4+i*2] = *(P_DC2data+modbus_add-2200+i) & 0x0FF;	
+		}
+		else if((modbus_add>=3000)&&(modbus_add<=3149))    // PCS所有数据读取
+		{
+			Uart7_Send_Buf[3+i*2] = (*(P_PCSdata+modbus_add-3000+i)>>8) & 0x0FF;
+			Uart7_Send_Buf[4+i*2] = *(P_PCSdata+modbus_add-3000+i) & 0x0FF;	
+		}
+		else if((modbus_add>=5000)&&(modbus_add<=5030))    //母线DC-DC 
+		{
+	//		Uart7_Send_Buf[3+i*2] = (*(P_MD950+modbus_add-5000+i)>>8) & 0x0FF;
+	//		Uart7_Send_Buf[4+i*2] = *(P_MD950+modbus_add-5000+i) & 0x0FF;	
 		}
 
 		else
@@ -172,6 +213,74 @@ static void handle_modbus_03h(uint16_t modbus_add,uint16_t modbus_dataNum)
 	Uart7_Send_Buf[modbus_len++] = modbus_crc_code & 0x0FF;
 
 	Uart7_Send(Uart7_Send_Buf,modbus_len);
+}
+
+static void handle_modbus_06h(uint16_t modbus_add,uint16_t data)
+{
+	uint16_t i;
+	if(modbus_add ==0)
+	{
+	//	send_uart3(BROADCAST_SITE_NUMBER,0,data,NULL); // 当从触摸屏写入公共站号，直接通过uart3转发，在这个函数内写入地址641
+	}
+		//ems参数
+	else if((modbus_add>=100)&&(modbus_add<=110)) {  //ems
+		*(P_EMS+modbus_add-100) = data;
+//		Store_par_DataFlash(P_EMS,FLASHQUAN_INFO,FLASHSECTOR_INFO,FLASHADD_INFO);	 //存储参数，由于当前波浪能只有一个开关机，直接存。不设密码
+	}
+	else if((modbus_add>=151)&&(modbus_add<=153)) {  //电能初值设置，不保存，在rtc中保存
+//		PVAC_Power[modbus_add-151] = (float)data;
+	}
+	else if((modbus_add>=160)&&(modbus_add<=164))    //time
+	{
+//		time_uart1[modbus_add-160] = data;
+	}
+	else if(modbus_add==166) // time写入
+	{
+		if(data== 1111){	
+//			timePC[0] = time_uart1[0];timePC[1] = time_uart1[1];timePC[2] = time_uart1[2];
+//			timePC[3] = time_uart1[3];timePC[4] = time_uart1[4];timePC[5] = time_uart1[5];
+//			xSemaphoreGive(BinarySemaphore_TimeWrite );//发送信号量  写入
+		}
+		else if(data== 2222){	
+//			time_uart1[0] = timePC[0];time_uart1[1] = timePC[1];time_uart1[2] = timePC[2];
+//			time_uart1[3] = timePC[3];time_uart1[4] = timePC[4];time_uart1[5] = timePC[5];
+		}
+	}
+	else if((modbus_add>=170)&&(modbus_add<=183))  //以太网参数 mac ip
+	{
+//		*(P_ethernet+modbus_add-170) = data;
+	}
+	else if(modbus_add==184) // 以太网写入
+	{
+		if(data== 1111){	
+//			Store_par_DataFlash(P_ethernet,FLASHQUAN_ETH,FLASHSECTOR_ETH,FLASHADD_ETH);//写入flash
+		}
+	}
+	
+	//DC2 2206-2217为不可保存参数 2270-2282为可保存参数
+	else if(((modbus_add>=2270)&&(modbus_add<=2282))||((modbus_add>=2206)&&(modbus_add<=2217))) { 
+		*(P_DC2data+modbus_add-2200) = data;  //写入到结构体以供显示
+//		send_uart3(MODULE_DC2,Uart1_modbus_address,Uart1_modbus_quant,NULL);
+	}
+	else if((modbus_add>=3100)&&(modbus_add<=3143)) {  // pcs
+		*(P_PCSdata+modbus_add-3100+100) = data;
+//		send_uart3(MODULE_PCS,modbus_add,data,MODBUS_WRITE);
+	}
+	else if((modbus_add>=5000)&&(modbus_add<=5010))    //母线DC-DC 
+	{
+//		*(P_MD950+modbus_add-5000) = data;
+//		send_can2_MD950( modbus_add, data);	
+	}
+		
+	else
+		return;
+
+	for(i=0;i<8;i++) //应答主机
+	{
+		Uart7_Send_Buf[i]= Uart7_rev[i];	
+	}
+	Uart7_Send(Uart7_Send_Buf,modbus_len);
+
 }
 
 void uart7_thread_entry(void* parameter)
@@ -252,7 +361,7 @@ void uart7_thread_entry(void* parameter)
 					case MODBUS_WRITE:
 						//20200420 之前函数嵌套过多，进行拆分:
 						////1 写入结构体并根据地址判断模块 ，应答触摸屏
-					//	handle_modbus_06h(Uart7_modbus_address,Uart7_modbus_quant);
+						handle_modbus_06h(Uart7_modbus_address,Uart7_modbus_quant);
 						//2 判断站号并写入，同时将module赋值为公共站号（仅用于判断）
 						//judge_portnumber(Uart1_modbus_address,&Module); 
 						//3 //将地址转换成各个模块的通讯地址并通过Uart3_Post写入到发送队列
@@ -310,7 +419,7 @@ void UART7_IRQHandler(void)
         {
             rxData = UARTx->RXDATA;
 
-            if (com7_rxlen < UART_LEN_MAX)
+            if (com7_rxlen < MAX_REV_QUANT)
                 Uart7_rev[com7_rxlen++] = rxData;
 			
 			if(com7_rxlen == 1) //开始接收
@@ -331,7 +440,43 @@ void UART7_IRQHandler(void)
     }
 }
 
-#define	POLY_CRC16	0xA001
+/* 定 时 器 1 超 时 函 数 */
+void timeout_uart7(void *parameter)
+{
+//    rt_kprintf("periodic timer is timeout \n");
+    static uint16_t com7_rx_sta = 0, last_com7_rx_sta = 0, last_com7_rxlen = 0; //com状态
+    //接收事件，阻塞，中断在开始接收后 发送事件
+//	rt_event_recv(&com_event,EVENT_FLAG_RV_UART7,(RT_EVENT_FLAG_OR|RT_EVENT_FLAG_CLEAR),RT_WAITING_FOREVER, &e);
+
+	if(com7_rxlen > last_com7_rxlen )
+	{
+		//正在接收状态
+		com7_rx_sta = 1;
+	}
+	else if(com7_rxlen == last_com7_rxlen )
+	{
+		//脱离接收状态
+		com7_rx_sta = 0;
+	}
+	else
+	{
+		//接收完毕 ，Uart7_rev_counter被置0,Uart7_rev_counter应在解析函数中置零
+	}
+
+	if((com7_rx_sta == 0) && (last_com7_rx_sta == 1))
+	{
+		Uart7_rev_counter = com7_rxlen;
+		rt_event_send(&com_event, EVENT_FLAG_PS_UART7);
+		com7_rxlen=0;
+		//发送信号量
+	}
+
+	last_com7_rx_sta = com7_rx_sta;
+	last_com7_rxlen = com7_rxlen;
+//	rt_thread_delay(10);
+}
+
+
 void Crc_Init( void )
 {
 	uint16_t	mask, bit, crc, mem;

@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
-              <IncludePath>.;..\..\include;applications;.;board;libraries\drivers;libraries\drivers\lib;libraries\drivers\cmsis;libraries\startup;libraries\startup\cmsis\include;..\..\libcpu\arm\cortex-m4;..\..\libcpu\arm\common;..\..\components\dfs\include;..\..\components\dfs\filesystems\devfs;..\..\components\drivers\include;..\..\components\drivers\include;..\..\components\drivers\include\drivers;..\..\components\finsh;..\..\components\libc\compilers\armlibc;..\..\components\libc\compilers\common;..\..\components\drivers\include\drivers;..\..\components\net\lwip-2.1.0\src\include;..\..\components\net\netdev\include;..\..\components\net\lwip-2.1.0\src;..\..\components\net\lwip-2.1.0\src\arch\include;..\..\components\utilities\ulog;..\..\components\dfs\filesystems\elmfat;..\..\components\dfs\filesystems\uffs;..\..\components\dfs\filesystems\uffs\src\inc</IncludePath>
+              <IncludePath>.;..\..\include;applications;.;board;libraries\drivers;libraries\drivers\lib;libraries\drivers\cmsis;libraries\startup;libraries\startup\cmsis\include;..\..\libcpu\arm\cortex-m4;..\..\libcpu\arm\common;..\..\components\dfs\include;..\..\components\dfs\filesystems\devfs;..\..\components\drivers\include;..\..\components\drivers\include;..\..\components\drivers\include\drivers;..\..\components\finsh;..\..\components\libc\compilers\armlibc;..\..\components\libc\compilers\common;..\..\components\drivers\include\drivers;..\..\components\net\lwip-2.1.0\src\include;..\..\components\net\netdev\include;..\..\components\net\lwip-2.1.0\src;..\..\components\net\lwip-2.1.0\src\arch\include;..\..\components\utilities\ulog;..\..\components\dfs\filesystems\elmfat;..\..\components\dfs\filesystems\uffs;..\..\components\dfs\filesystems\uffs\src\inc;.\applications</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -473,6 +473,11 @@
               <FileType>1</FileType>
               <FilePath>.\applications\uart7.c</FilePath>
             </File>
+            <File>
+              <FileName>uart0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\uart0.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -529,14 +534,14 @@
               <FilePath>.\board\drv_uart.c</FilePath>
             </File>
             <File>
-              <FileName>drv_wdt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\board\drv_wdt.c</FilePath>
-            </File>
-            <File>
               <FileName>drv_eth.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\board\drv_eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_wdt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\board\drv_wdt.c</FilePath>
             </File>
             <File>
               <FileName>misc.c</FileName>

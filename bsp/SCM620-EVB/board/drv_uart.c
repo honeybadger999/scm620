@@ -288,17 +288,17 @@ struct scm620_uart uart0 =
     UART0_IRQn
 };
 static struct rt_serial_device serial0;
-
+/*
 void UART0_IRQHandler(void)
 {
-    /* enter interrupt */
+    
     rt_interrupt_enter();
 
     uart_isr(&serial0);
 
-    /* leave interrupt */
+
     rt_interrupt_leave();
-}
+}*/
 #endif /* RT_USING_UART0 */
 
 #if defined(RT_USING_UART1)

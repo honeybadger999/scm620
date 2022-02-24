@@ -17,6 +17,7 @@
 #include "rtthread.h"
 #include "libc.h"
 
+//#include "SCM62X.h" //ff ÎªÁËITM_SendChar
 #ifdef RT_USING_DFS
 #include "dfs_posix.h"
 #endif
@@ -314,6 +315,9 @@ int fputc(int c, FILE *f)
 
     ch[0] = c;
     rt_kprintf(&ch[0]);
+	
+	//ITM_SendChar(c); //ff
+
     return 1;
 }
 
