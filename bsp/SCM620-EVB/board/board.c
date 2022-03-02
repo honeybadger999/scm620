@@ -90,7 +90,7 @@ void SystemClock_Config(void)
     //configure main_clk
     CLK_ConfigMainClk(PLL);
     CLK_SelectHclk(SYSCLK_CTRL_HCLK_SEL_SYSCLK_DIV2) ; //HCLK = 150/2 为系统时钟2分频
-    CLK_SelectPclk(SYSCLK_CTRL_PCLK_SEL_HCLK_DIV4) ;  //PCLK = 150/4 = 37.5M 为hclk4分频
+    CLK_SelectPclk(SYSCLK_CTRL_PCLK_SEL_HCLK_DIV4) ;  //PCLK = 150/4 = 37.5M 为hclk4分频  150/8
     CLK_EnAllClk();
 	
 	  //初始化SysTick

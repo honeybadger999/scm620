@@ -47,13 +47,35 @@ extern int __bss_end;
 #define EVENT_FLAG_RV_UART3 (1 << 3)
 #define EVENT_FLAG_PS_UART7 (1 << 4)
 #define EVENT_FLAG_RV_UART7 (1 << 5)
+#define EVENT_FLAG_RTC_WRITE (1 << 6)
+
 extern rt_mailbox_t mb_uart0;
 extern rt_sem_t sem_com_pcs ;
 extern rt_sem_t sem_com_dc ;
+extern rt_sem_t sem_com_meter ;
+extern rt_sem_t sem_com_pv ;
+extern rt_mq_t mq_can0;
+extern rt_mq_t mq_can1_rev;
+extern rt_mq_t mq_can1_send;
+
+extern void rtc_thread_entry(void *parameter);
+extern void flash_thread_entry(void *parameter);
+extern void can0_rev_thread_entry(void *parameter);
+extern void can1_rev_thread_entry(void *parameter);
+extern void can1_send_thread_entry(void *parameter);
+extern void uart7_thread_entry(void* parameter);
+extern void uart0_rev_thread_entry(void* parameter);
+extern void uart0_read_thread_entry(void* parameter);
+extern void Uart0_MSG_thread_entry(void* parameter);
+extern struct rt_thread uart7_thread;
+
+extern void uart3_rev_thread_entry(void* parameter);
+extern void uart3_read_thread_entry(void *parameter);
 
 void SystemClock_Config(void);
 void rt_hw_board_init(void);
 void SysTick_Handler(void);
+extern void InitGlobalVariables(void);
 
 extern struct rt_event com_event;
 #ifdef __cplusplus

@@ -6,6 +6,11 @@
 #include <dfs_fs.h>
 #include <dfs_file.h>
 #include "LE_uart.h"
+//#include "LE_can.h"
+//#include "LE_sst_flash.h"
+//#include "RX8025T.h"
+
+
 
 //const struct dfs_mount_tbl mount_table[] =
 //{
@@ -13,19 +18,23 @@
 //    {0}
 //};
 
-
 #ifdef RT_USING_FINSH
     #include <finsh.h>
     #include <shell.h>
 #endif
-
-
 
 struct rt_event com_event;
 //static struct rt_mailbox mb_uart0;
 rt_mailbox_t mb_uart0 = RT_NULL;
 rt_sem_t sem_com_pcs = RT_NULL;
 rt_sem_t sem_com_dc = RT_NULL;
+rt_sem_t sem_com_meter = RT_NULL;
+rt_sem_t sem_com_pv = RT_NULL;
+rt_mq_t mq_can0 = RT_NULL;
+rt_mq_t mq_can1_rev = RT_NULL;
+rt_mq_t mq_can1_send = RT_NULL;
+
+extern CAN_FrameInfoTypeDef  ReceFrame;
 
 void LED_Display(void *args)
 {
@@ -155,9 +164,8 @@ int main(void)
 	
     static struct fm24clxx_config fm24c08_config;
     /* 定 时 器 的 控 制 块 */
-    static rt_timer_t timer1,timer2;
-    /* 事 件 控 制 块 */
-	Crc_Init();	
+    static rt_timer_t timer1,timer2,timer3;
+    /* 事 件 控 制 块 */	
     /*
         w25qxx_init("w25q64", "spi1");
         fm24c08_config.addr = 0xA0;
@@ -167,6 +175,23 @@ int main(void)
     */
     /* init pin thread */
 
+	sem_com_pcs =  rt_sem_create("sem_com_pcs",0,RT_IPC_FLAG_FIFO);
+	sem_com_dc =  rt_sem_create("sem_com_dc",0,RT_IPC_FLAG_FIFO);
+	sem_com_meter = rt_sem_create("sem_com_meter",0,RT_IPC_FLAG_FIFO);
+	sem_com_pv = rt_sem_create("sem_com_pv",0,RT_IPC_FLAG_FIFO);
+	
+	mq_can0 = rt_mq_create("can0_rev", sizeof(ReceFrame),30, RT_IPC_FLAG_FIFO);
+	mq_can1_rev = rt_mq_create("can1_rev", sizeof(ReceFrame),30, RT_IPC_FLAG_FIFO);
+	mq_can1_send = rt_mq_create("can1_send", sizeof(ReceFrame),30, RT_IPC_FLAG_FIFO);
+	
+    result = rt_event_init(&com_event, "event", RT_IPC_FLAG_PRIO);
+	mb_uart0 = rt_mb_create ("mailbox_uart0",256, RT_IPC_FLAG_FIFO);
+	if (mb_uart0 == RT_NULL)
+	{
+		rt_kprintf("init mailbox failed.\n");
+		return -1;
+	}
+	
     result = rt_thread_init(&pin_thread,
                             "pin",
                             pin_thread_entry,
@@ -232,7 +257,7 @@ int main(void)
                             RT_NULL,
                             (rt_uint8_t*)&uart7_stack[0],
                             sizeof(uart7_stack),
-                            RT_THREAD_PRIORITY_MAX / 3,  //0 优先级代表最高优先级，最低优先级留给空闲线程使用；
+                            8,  //0 优先级代表最高优先级，最低优先级留给空闲线程使用；
                             5);
 
     if (result == RT_EOK)
@@ -268,11 +293,13 @@ int main(void)
         rt_thread_startup(&uart0_read_thread);
     }
 */
+
+
 	tid1 = rt_thread_create("uart0_rev",
 							uart0_rev_thread_entry, 
 							RT_NULL,
 							256,
-							RT_THREAD_PRIORITY_MAX / 3, 5);
+							8, 5);
 	
 	if (tid1 != RT_NULL)
 		rt_thread_startup(tid1);
@@ -295,15 +322,71 @@ int main(void)
 	if (tid1 != RT_NULL)
 		rt_thread_startup(tid1);
 	
+	tid1 = rt_thread_create("uart3_rev",
+							uart3_rev_thread_entry, 
+							RT_NULL,
+							256,
+							8, 5);
+	
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
+	
+	tid1 = rt_thread_create("uart3_read",
+							uart3_read_thread_entry, 
+							RT_NULL,
+							256,
+							RT_THREAD_PRIORITY_MAX / 3, 5);
+	
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
+	
+	tid1 = rt_thread_create("can0_rev",
+							can0_rev_thread_entry, 
+							RT_NULL,
+							256,
+							RT_THREAD_PRIORITY_MAX / 3, 5);
+	
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
+	
+	tid1 = rt_thread_create("can1_rev",
+							can1_rev_thread_entry, 
+							RT_NULL,
+							256,
+							RT_THREAD_PRIORITY_MAX / 3, 5);
+	
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
+	
+	tid1 = rt_thread_create("can1_send",
+							can1_send_thread_entry, 
+							RT_NULL,
+							256,
+							RT_THREAD_PRIORITY_MAX / 3, 5);
+	
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
 	
 	
+	tid1 = rt_thread_create("flash",
+							flash_thread_entry, 
+							RT_NULL,
+							256,
+							RT_THREAD_PRIORITY_MAX / 3, 5);
 	
-	mb_uart0 = rt_mb_create ("mailbox_uart0",256, RT_IPC_FLAG_FIFO);
-	if (mb_uart0 == RT_NULL)
-	{
-		rt_kprintf("init mailbox failed.\n");
-		return -1;
-	}
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
+	
+	tid1 = rt_thread_create("rtc",
+							rtc_thread_entry, 
+							RT_NULL,
+							256,
+							6, 5);
+	
+	if (tid1 != RT_NULL)
+		rt_thread_startup(tid1);
+	
+
 /*    result = rt_thread_init(&uart7_timer_thread,
                             "timer7",
                             uart7_timer_thread_entry,
@@ -319,25 +402,29 @@ int main(void)
     }
 */
     timer1 = rt_timer_create("timer_uart7", timeout_uart7,
-                             RT_NULL, 5,
+                             RT_NULL, 10,
                              RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
 
     if (timer1 != RT_NULL)
         rt_timer_start(timer1);
 	
 	timer2 = rt_timer_create("timer_uart0", timeout_uart0,
-                             RT_NULL, 5,
+                             RT_NULL, 10,
                              RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
 
     if (timer2 != RT_NULL)
         rt_timer_start(timer2);
 	
+	timer3 = rt_timer_create("timer_uart3", timeout_uart3,
+                             RT_NULL, 10,
+                             RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
 
-	sem_com_pcs =  rt_sem_create("sem_com_pcs",0,RT_IPC_FLAG_FIFO);
-	sem_com_dc =  rt_sem_create("sem_com_dc",0,RT_IPC_FLAG_FIFO);
+    if (timer3 != RT_NULL)
+        rt_timer_start(timer3);
 	
 	
-    result = rt_event_init(&com_event, "event", RT_IPC_FLAG_PRIO);
+	InitGlobalVariables();
+
     return 0;
 }
 

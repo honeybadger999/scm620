@@ -21,18 +21,18 @@
 #define RT_CANSND_BOX_NUM   1
 #endif
 
-enum CANBAUD
-{
-    CAN1MBaud   = 1000UL * 1000,/* 1 MBit/sec   */
-    CAN800kBaud = 1000UL * 800, /* 800 kBit/sec */
-    CAN500kBaud = 1000UL * 500, /* 500 kBit/sec */
-    CAN250kBaud = 1000UL * 250, /* 250 kBit/sec */
-    CAN125kBaud = 1000UL * 125, /* 125 kBit/sec */
-    CAN100kBaud = 1000UL * 100, /* 100 kBit/sec */
-    CAN50kBaud  = 1000UL * 50,  /* 50 kBit/sec  */
-    CAN20kBaud  = 1000UL * 20,  /* 20 kBit/sec  */
-    CAN10kBaud  = 1000UL * 10   /* 10 kBit/sec  */
-};
+//enum CANBAUD
+//{
+ //   CAN1MBaud   = 1000UL * 1000,/* 1 MBit/sec   */
+//    CAN800kBaud = 1000UL * 800, /* 800 kBit/sec */
+  //  CAN500kBaud = 1000UL * 500, /* 500 kBit/sec */
+ //   CAN250kBaud = 1000UL * 250, /* 250 kBit/sec */
+ //   CAN125kBaud = 1000UL * 125, /* 125 kBit/sec */
+//    CAN100kBaud = 1000UL * 100, /* 100 kBit/sec */
+ //   CAN50kBaud  = 1000UL * 50,  /* 50 kBit/sec  */
+ //   CAN20kBaud  = 1000UL * 20,  /* 20 kBit/sec  */
+//    CAN10kBaud  = 1000UL * 10   /* 10 kBit/sec  */
+//};
 
 #define RT_CAN_MODE_NORMAL              0
 #define RT_CAN_MODE_LISEN               1

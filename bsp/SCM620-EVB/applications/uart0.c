@@ -408,7 +408,7 @@ void uart0_read_thread_entry(void* parameter)
 	{		
 
 		Uart0_Post(DC2_485PORT,MODBUS_READ,DC_READ_START_ADD, DC_READ_QUAN);
-		rt_sem_take(sem_com_dc, 20);// 获取信号量 超时等待
+		xReturn = rt_sem_take(sem_com_dc, 20);// 获取信号量 超时等待
 		if(xReturn == RT_EOK)
 			LEUER_Data.EMS_Data.DC2_Com_State = PASS;
 		else
@@ -422,7 +422,7 @@ void uart0_read_thread_entry(void* parameter)
 
 		PCS_Read_Block = 1;
 		Uart0_Post(PCS_485PORT,MODBUS_READ,PCS_READ_START_ADD1, PCS_READ_QUAN1);
-		rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待
+		xReturn = rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待
 		rt_thread_delay(20);
 		if(xReturn == RT_EOK)
 			LEUER_Data.EMS_Data.PCS_Com_State = PASS;

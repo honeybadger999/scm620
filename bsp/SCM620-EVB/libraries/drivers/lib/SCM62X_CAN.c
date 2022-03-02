@@ -19,6 +19,8 @@
 /*               #include（依次为标准库头文件、非标准库头文件）               */
 /******************************************************************************/
 #include "SCM62X.h"
+//extern void delay(unsigned int time);
+uint8_t mozu_zhuang_state;
 
 /******************************************************************************/
 /*                                外部引用定义                                */
@@ -145,6 +147,14 @@ void CAN_Sleep(SGCC_CAN_TypeDef* CANx)
   Returns:     None                                                                                      
   Description: Init CAN                               
  *-----------------------------------------------------------------------------*/
+void delay(unsigned int time)
+{
+    unsigned int a = 0, b = 0;
+
+    for (a = 0; a < time; a++)
+        for (b = 0; b < 1000; b++)
+            ;
+}
 void CAN_Init(SGCC_CAN_TypeDef* CANx, CAN_InitTypeDef* CAN_InitStruct)
 {
     volatile uint8_t Judge;
@@ -211,13 +221,19 @@ void CAN_SendData(SGCC_CAN_TypeDef* CANx,CAN_FrameInfoTypeDef *CAN_FrameInfoStru
     volatile uint32_t *p_StartDataAddr;
     uint32_t i;
     
+			i=0;
     do
     {
         Judge = CANx->SR;
+				delay(1);
+				i++;
+				if(i>5000) {mozu_zhuang_state=1; return;}
     }
-    //while(((Judge & 0x0C) != 0x0C)||(Judge & 0x10)); // 发送缓冲器被锁。等待
-    //while(((Judge & 0x04) != 0x04)||(Judge & 0x10)); // 发送缓冲器被锁。等待
+    //while(((Judge & 0x0C) != 0x0C)||(Judge & 0x10)); // ·￠?í?o3??÷±????￡μè′y
+    //while(((Judge & 0x04) != 0x04)||(Judge & 0x10)); // ·￠?í?o3??÷±????￡μè′y
     while((Judge & 0x04) != 0x04);
+    	
+		mozu_zhuang_state=0;//在线	
     
     CANx->TFINFO_RFINFO_ACR0  = (CAN_FrameInfoStruct->FrameFormat<<7)|(CAN_FrameInfoStruct->FrameType<<6) 
                               | (CAN_FrameInfoStruct->DataLength & 0x0F) ;    // 最后的0x0F保证BIT5,BIT4为"0"

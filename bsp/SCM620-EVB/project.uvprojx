@@ -478,6 +478,41 @@
               <FileType>1</FileType>
               <FilePath>.\applications\uart0.c</FilePath>
             </File>
+            <File>
+              <FileName>uart3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\uart3.c</FilePath>
+            </File>
+            <File>
+              <FileName>can0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\can0.c</FilePath>
+            </File>
+            <File>
+              <FileName>can1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\can1.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi1_sst25.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\spi1_sst25.c</FilePath>
+            </File>
+            <File>
+              <FileName>rx8025t.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rx8025t.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>global.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\global.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

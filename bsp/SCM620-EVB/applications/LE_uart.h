@@ -101,27 +101,22 @@ extern  uint16_t *P_DC2data ;
 extern  uint16_t *P_EMS ;
 
 extern rt_uint8_t uart7_stack[256];
-extern struct rt_thread uart7_thread;
-extern void uart7_thread_entry(void* parameter);
-extern uint16_t Uart7_rev_counter,com7_rxlen;
+extern float PVAC_Power[3];
+
+
 void timeout_uart7(void *parameter);
 void timeout_uart0(void *parameter);
+void timeout_uart3(void *parameter);
 
-extern struct rt_thread uart0_rev_thread;
-extern void uart0_rev_thread_entry(void* parameter);
-extern uint16_t Uart0_rev_counter,com0_rxlen;
 
-extern struct rt_thread uart0_read_thread;
-extern void uart0_read_thread_entry(void* parameter);
-void Uart0_MSG_thread_entry(void* parameter);
+
+
 extern struct DC_Data DC2data;
 
 extern struct STRUCT_PCS PCSdata;
 extern struct PV_GLASS PV_Glass;
 
 extern uint16_t *P_DC2data;	
-
-
 extern uint16_t *P_PCSdata ;
 
 extern struct Hour_Meter hour_meter;
@@ -132,6 +127,7 @@ extern struct Hour_Meter hour_meter;
 extern void send_can1(uint16_t modbus_add,int16_t data);
 extern void send_uart3(uint16_t module,uint16_t add,uint32_t data,uint16_t fuccode);
 extern void send_can2_MD950(uint16_t modbus_add,uint32_t data);
+extern uint8_t Uart0_Post(uint8_t port,uint8_t command,uint16_t add,uint32_t data);
 /***********************************UART**********************************************/
 struct CRC_TABLE{
  	uint16_t      TABLE1[256];

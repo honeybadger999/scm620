@@ -351,17 +351,15 @@ struct scm620_uart uart3 =
     UART3_IRQn
 };
 static struct rt_serial_device serial3;
-
+/*
 void UART3_IRQHandler(void)
 {
-    /* enter interrupt */
     rt_interrupt_enter();
 
     uart_isr(&serial3);
 
-    /* leave interrupt */
     rt_interrupt_leave();
-}
+}*/
 #endif /* RT_USING_UART3 */
 
 #if defined(RT_USING_UART4)
