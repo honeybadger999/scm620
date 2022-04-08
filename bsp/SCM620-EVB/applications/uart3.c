@@ -288,28 +288,28 @@ void uart3_read_thread_entry(void *parameter)
 			LEUER_Data.EMS_Data.BAT_Com_State = PASS;
 		else
 			LEUER_Data.EMS_Data.BAT_Com_State = FAIL;
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		
 		Read_Block=2;
 		Uart3_MSG_send(METER_485PORT,MODBUS_READ,0x00D8, 2);
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		Read_Block=3;
 		Uart3_MSG_send(METER_485PORT,MODBUS_READ,0x013C, 2);
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		Read_Block=4;
 		Uart3_MSG_send(METER_485PORT,MODBUS_READ,0x01A0, 2);
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		
 		
 		Read_Block=5;
 		Uart3_MSG_send(METER_485PORT,MODBUS_READ,0x0204, 2);
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		Read_Block=6;
 		Uart3_MSG_send(METER_485PORT,MODBUS_READ,0x0268, 2);
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		Read_Block=7;
 		Uart3_MSG_send(METER_485PORT,MODBUS_READ,0x02C8, 2);
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 		
 		//读取玻璃光伏 04功能码 3004地址读取11个数据
 		Uart3_MSG_send(1,4,3004, 11);
@@ -319,7 +319,7 @@ void uart3_read_thread_entry(void *parameter)
 			LEUER_Data.EMS_Data.BAT_Com_State = PASS;
 		else
 			LEUER_Data.EMS_Data.BAT_Com_State = FAIL;
-		rt_thread_delay(200);
+		rt_thread_delay(2000/ portTICK_RATE_MS);
 	}
 }
 

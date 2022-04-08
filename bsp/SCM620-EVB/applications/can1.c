@@ -82,7 +82,7 @@ void can1_rev_thread_entry(void *parameter)
 		SendFrame.FrameData[5] =  0;
 		SendFrame.FrameData[6] =  0;
 		SendFrame.FrameData[7] =  0;
-		
+		//用于测试，此处应屏蔽
 		CAN_SendData(SGCC_CAN1_P, &SendFrame, CAN_COMMAND_TRANSMISSION_REQUEST); 	//CAN0发送数据	
 	}	
 }
@@ -94,7 +94,7 @@ void can1_send_thread_entry(void *parameter)
 	{	
 		rt_mq_recv(mq_can1_send, &ReceFrame, sizeof(ReceFrame), RT_WAITING_FOREVER);
 		CAN_SendData(SGCC_CAN1_P, &ReceFrame, CAN_COMMAND_TRANSMISSION_REQUEST); 
-		rt_thread_delay(10);
+		rt_thread_delay(100/ portTICK_RATE_MS);
 	}	
 }
 
@@ -130,38 +130,6 @@ uint8_t CAN2_Post(enum MODULE module ,uint8_t msgtype,uint16_t valuetype,uint16_
 		
 	}	
 	rt_mq_send (mq_can1_send,&SendFrame, sizeof(SendFrame));
-}
-
-
-/**
-  * @brief  将十进制数据转换成IEEE754浮点型数据，初步测试没有问题
-  * @param  None
-  * @retval None
- 单精度浮点数 float：32 位，符号位 S 占 1 bit，指数 E 占 8 bit，尾数 M 占 23 bit
- 尾数 M 的第一位总是 1(因为 1 <= M < 2)，因此这个 1 可以省略不写，它是个隐藏位，这样单精度 23 位尾数可以表示了 24 位有效数字
-  */
-uint32_t data2hex(uint32_t data)  
-{
-	uint32_t temp,temp2;  
-	uint8_t i=0;  
-	
-	temp = data;//转存需要计算的数值  
-	while(temp)  
-	{         
-		temp >>= 1;  
-		i++;//计算当前值的尾数占有的位数  
-	}  
-	i--;//计算下来，i会多加一次，这儿减掉    
-	temp = data;  //再次赋值，准备合并        
-	temp = temp<<(23-1-i);//补足23位尾数  这里23-i不对，应该是22-i 
-	
-	temp = temp&0x003FFFFF; //将尾数的最高位和其它非尾数的位清零
-	temp = temp<<1; //相当于去掉了尾数的最高位
-	
-	temp = (i+127)<<23 | temp;//计算指数，并与尾数合并起来 
-	temp = temp & ~(1<<31);//确定正负  
-	
-	return temp;//这里就已经是以浮点数的存储方式表示的传进来的参数了
 }
 
 

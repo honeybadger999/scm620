@@ -521,7 +521,7 @@
  * (only needed if you use the sequential API, like api_lib.c)
  */
 #if !defined MEMP_NUM_NETBUF || defined __DOXYGEN__
-#define MEMP_NUM_NETBUF                 2
+#define MEMP_NUM_NETBUF                 5
 #endif
 
 /**

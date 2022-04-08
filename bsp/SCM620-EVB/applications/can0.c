@@ -37,8 +37,14 @@ void  BSP_CAN0_Init(_BSPCAN_PORT num)
     CAN_InitStruct.CAN_Mode = CAN_MODE_FILTER_SIGLE;//CAN设置  单过滤器。 使用一个 4 字节过滤器过滤所接收数据
 
 //    CAN_InitStruct.CAN_BTR0 = CAN_BTR0_SJW3 | CAN_BTR0_BRP(5); //总线时序0  总线时许1  P329   62.5m
-	CAN_InitStruct.CAN_BTR0 = CAN_BTR0_SJW3 | CAN_BTR0_BRP(2); //125k
-    CAN_InitStruct.CAN_BTR1 = CAN_BTR1_SAM_ONCE | CAN_BTR1_TSEG2(7) | CAN_BTR1_TSEG1(15);
+
+	// 250k
+//	CAN_InitStruct.CAN_BTR0 = CAN_BTR0_SJW3 | CAN_BTR0_BRP(2); 
+ //   CAN_InitStruct.CAN_BTR1 = CAN_BTR1_SAM_ONCE | CAN_BTR1_TSEG2(3) | CAN_BTR1_TSEG1(7);
+
+	// 500k  
+	CAN_InitStruct.CAN_BTR0 = CAN_BTR0_SJW3 | CAN_BTR0_BRP(1); 
+    CAN_InitStruct.CAN_BTR1 = CAN_BTR1_SAM_ONCE | CAN_BTR1_TSEG2(2) | CAN_BTR1_TSEG1(4);
 
     CAN_InitStruct.CAN_OCM  = CAN_OCR_OCM2; //输出控制模式：正常
     CAN_InitStruct.CAN_CDC  = CAN_ODR_CLKOUT_OFF;//CAN_ODR_CLKOUT_DIV6; 输出时钟和分频控制 ：输出关闭
@@ -71,7 +77,7 @@ void can0_rev_thread_entry(void *parameter)
 	BSP_CAN0_Init(CAN_PORT0);
 	for(;;)
 	{
-		//rt_thread_delay(100);
+		//rt_thread_delay(1000/ portTICK_RATE_MS);
 		rt_mq_recv(mq_can0, &ReceFrame, sizeof(ReceFrame), RT_WAITING_FOREVER);
 
 		//云谷园项目 没有电池，为pcs做假通讯

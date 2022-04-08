@@ -367,7 +367,7 @@
 #endif
 
 /* Maximum number of retransmissions of data segments. */
-#define TCP_MAXRTX                  12
+#define TCP_MAXRTX                  4
 
 /* Maximum number of retransmissions of SYN segments. */
 #define TCP_SYNMAXRTX               4

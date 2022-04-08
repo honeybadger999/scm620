@@ -10,6 +10,7 @@
 #include "RX8025T.h"
 #include "eth.h"
 #include "LE_can.h"
+#include "LE_data_transfer.h"
 
 static uint8_t TxCount = 0;
 rt_uint8_t uart7_stack[256];
@@ -32,8 +33,6 @@ uint16_t *P_EMS = ( uint16_t *)&LEUER_Data.EMS_Data;
 uint16_t *P_PCSdata = ( uint16_t *)&PCSdata;
 uint16_t *P_MD950 = ( uint16_t *)&TRD_MD950_Value;
 
-float PVAC_Power[3];
-
 /* 串 口 接 收 消 息 结 构*/
 struct rx_msg
 {
@@ -41,7 +40,7 @@ struct rx_msg
 	rt_size_t size;
 };
 /* 消 息 队 列 控 制 块 */
-static struct rt_messagequeue rx_mq;
+//static struct rt_messagequeue rx_mq;
 /* 接 收 数 据 回 调 函 数 */
 /*
 static rt_err_t uart7_input(rt_device_t dev, rt_size_t size)
@@ -331,9 +330,7 @@ void uart7_thread_entry(void* parameter)
     static rt_device_t uart7_device = RT_NULL;
     struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT; /* 初 始 化 配 置 参 数 */
 //	static char msg_pool[256];
-	struct rx_msg msg;
-	rt_err_t result;
-	rt_uint16_t rx_length;
+//	struct rx_msg msg;
 	rt_uint32_t e;
 	uint16_t Uart7_modbus_address;		
 	uint16_t Uart7_modbus_quant;
@@ -401,13 +398,7 @@ void uart7_thread_entry(void* parameter)
 					break;
 	
 					case MODBUS_WRITE:
-						//20200420 之前函数嵌套过多，进行拆分:
-						////1 写入结构体并根据地址判断模块 ，应答触摸屏
 						handle_modbus_06h(Uart7_modbus_address,Uart7_modbus_quant);
-						//2 判断站号并写入，同时将module赋值为公共站号（仅用于判断）
-						//judge_portnumber(Uart1_modbus_address,&Module); 
-						//3 //将地址转换成各个模块的通讯地址并通过Uart3_Post写入到发送队列
-						//send_uart3(Module,Uart1_modbus_address,Uart1_modbus_quant);
 					break;
 					case 0x01:
 					//	handle_modbus_01h(Uart7_modbus_address,Uart7_modbus_quant);
@@ -423,8 +414,6 @@ void uart7_thread_entry(void* parameter)
 				}
 			}
 		}
-		/* 打 印 数 据 */
-		//rt_kprintf("%s\n",Uart7_rev);	
     }
 }
 

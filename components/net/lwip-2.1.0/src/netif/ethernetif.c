@@ -67,6 +67,8 @@
 #define netifapi_netif_set_link_up(n)      netifapi_netif_common(n, netif_set_link_up, NULL)
 #define netifapi_netif_set_link_down(n)    netifapi_netif_common(n, netif_set_link_down, NULL)
 
+extern uint16_t link_status_global;
+
 #ifndef RT_LWIP_ETHTHREAD_PRIORITY
 #define RT_ETHERNETIF_THREAD_PREORITY   0x90
 #else
@@ -629,10 +631,14 @@ static void eth_rx_thread_entry(void* parameter)
                 device->link_changed = 0x00;
                 rt_hw_interrupt_enable(level);
 
-                if (status)
+                if (status){
                     netifapi_netif_set_link_up(device->netif);
-                else
+					link_status_global = 1;
+				}
+                else{
                     netifapi_netif_set_link_down(device->netif);
+					link_status_global = 0;
+				}
             }
 
             /* receive all of buffer */

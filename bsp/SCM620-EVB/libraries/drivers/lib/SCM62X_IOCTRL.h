@@ -303,6 +303,10 @@ EXT_IOCTRL void PIN_CfgPullAbility(UINT8 pinCfg, UINT8 opt);
 EXT_IOCTRL void GPIO_InitPad(UINT8 ioNo);
 EXT_IOCTRL void NandFlashCtrl_InitPad(void);
 EXT_IOCTRL void MCO_InitPad(void);
+
+EXT_IOCTRL void RMII1_InitPad(void);
+EXT_IOCTRL void MII0_InitPad(void);
+
 void RTCTM_InitPad(void);
 void IO_ConfigPullUp(UINT8 ioNo, FunctionalState opt);
 void IO_ConfigPullDown(UINT8 ioNo, FunctionalState opt);

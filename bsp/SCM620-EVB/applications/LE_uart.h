@@ -101,8 +101,6 @@ extern  uint16_t *P_DC2data ;
 extern  uint16_t *P_EMS ;
 
 extern rt_uint8_t uart7_stack[256];
-extern float PVAC_Power[3];
-
 
 void timeout_uart7(void *parameter);
 void timeout_uart0(void *parameter);

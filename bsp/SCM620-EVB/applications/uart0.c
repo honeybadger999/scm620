@@ -361,7 +361,7 @@ void Uart0_MSG_thread_entry(void* parameter)
 		任务中的等待可认为是同步进行的，不是相加关系，所以设置为400ms
 		而且当前采用任务方式，所以延时时间就是发送间隔		
 */
-		rt_thread_delay(30);
+		rt_thread_delay(300/ portTICK_RATE_MS);
 	}
 }
 
@@ -413,17 +413,17 @@ void uart0_read_thread_entry(void* parameter)
 			LEUER_Data.EMS_Data.DC2_Com_State = PASS;
 		else
 			LEUER_Data.EMS_Data.DC2_Com_State = FAIL;
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 		//读取DC2的 可保存参数
 		Uart0_Post(DC2_485PORT,MODBUS_READ,DC_SET_START_ADD, DC_SET_QUAN);
 		rt_sem_take(sem_com_dc, 20);// 获取信号量 超时等待
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 		
 
 		PCS_Read_Block = 1;
 		Uart0_Post(PCS_485PORT,MODBUS_READ,PCS_READ_START_ADD1, PCS_READ_QUAN1);
 		xReturn = rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 		if(xReturn == RT_EOK)
 			LEUER_Data.EMS_Data.PCS_Com_State = PASS;
 		else
@@ -432,22 +432,22 @@ void uart0_read_thread_entry(void* parameter)
 		PCS_Read_Block = 6;
 		Uart0_Post(PCS_485PORT,MODBUS_READ,PCS_READ_START_ADD2, PCS_READ_QUAN2);
 		rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 		//读取PCS的 可保存参数
 		PCS_Read_Block = 2;
 		Uart0_Post(PCS_485PORT,MODBUS_READ,PCS_SET_START_ADD, PCS_SET_QUAN);
 		rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待	
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 		
 		PCS_Read_Block = 3;
 		Uart0_Post(PCS_485PORT,MODBUS_READ,0x2800, 4);
 		rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待	
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 				
 		PCS_Read_Block = 4;
 		Uart0_Post(PCS_485PORT,MODBUS_READ,PCS_VDC_READ_ADD, 1);
 		rt_sem_take(sem_com_pcs, 20);// 获取信号量 超时等待
-		rt_thread_delay(20);
+		rt_thread_delay(200/ portTICK_RATE_MS);
 		
 		/*			
 		Uart3_Post(PCS_485PORT,MODBUS_READ,0x2900, 2);
@@ -463,7 +463,7 @@ void uart0_read_thread_entry(void* parameter)
 
 
 		// 延时钟
-		 rt_thread_delay(100);
+		rt_thread_delay(1000/ portTICK_RATE_MS);
 	}
 
 }

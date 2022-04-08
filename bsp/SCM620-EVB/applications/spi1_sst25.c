@@ -528,10 +528,10 @@ void flash_thread_entry(void *parameter)
     for(;;)
     {
 		
-		rt_thread_delay(300);
+		rt_thread_delay(3000/ portTICK_RATE_MS);
 		for (i = 0; i < sizeof(wbuf); i++)
 		{
-			wbuf[i] = i;
+	//		wbuf[i] = i;
 		}
 		
 //		Store_par_DataFlash(wbuf,FLASHQUAN_INFO,FLASHSECTOR_INFO,FLASHADD_INFO);

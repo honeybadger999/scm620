@@ -10,6 +10,7 @@
 #include "RX8025T.h"
 #include "LE_sst_flash.h"
 #include "LE_uart.h"
+#include "LE_data_transfer.h"
 
 #define SDAA_Read()   GPIO_RdDataIn(3)
 
@@ -506,7 +507,6 @@ void rtc_thread_entry(void *parameter)
 {
 	rt_uint32_t e;
 	static uint16_t timer=0,timer_1hour=0;
-	uint16_t temp=0;
 	uint16_t *P_power = ( uint16_t *)&(PVAC_Power[0]);
 	rt_err_t val;
 	RX8025T_Init();
@@ -522,7 +522,7 @@ void rtc_thread_entry(void *parameter)
 	
 	for(;;)
 	{
-		rt_thread_delay(300);
+		rt_thread_delay(3000/ portTICK_RATE_MS);
 			
 		if(timer++ == 5)
 		{

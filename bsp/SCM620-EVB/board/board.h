@@ -21,10 +21,10 @@ extern "C" {
 #endif
 
 #define SCM630_FLASH_START_ADRESS     ((uint32_t)0x00000000)
-#define SCM630_FLASH_SIZE             (2048 * 1024)
+#define SCM630_FLASH_SIZE             (1024 * 1024)
 #define SCM630_FLASH_END_ADDRESS      ((uint32_t)(SCM630_FLASH_START_ADRESS + SCM630_FLASH_SIZE))
 
-#define SCM630_SRAM_SIZE           512
+#define SCM630_SRAM_SIZE           256
 #define SCM630_SRAM_END            (0x20000000 + SCM630_SRAM_SIZE * 1024)
 
 #if defined(__CC_ARM) || defined(__CLANG_ARM)
@@ -41,6 +41,7 @@ extern int __bss_end;
 #define HEAP_END        SCM630_SRAM_END
 
 
+#define portTICK_RATE_MS (1000/RT_TICK_PER_SECOND)
 #define EVENT_FLAG_PS_UART0 (1 << 0)
 #define EVENT_FLAG_RV_UART0 (1 << 1)
 #define EVENT_FLAG_PS_UART3 (1 << 2)
@@ -67,6 +68,12 @@ extern void uart7_thread_entry(void* parameter);
 extern void uart0_rev_thread_entry(void* parameter);
 extern void uart0_read_thread_entry(void* parameter);
 extern void Uart0_MSG_thread_entry(void* parameter);
+extern void eth_thread_entry(void* parameter);
+extern void Data_Transfer_entry(void* parameter);
+extern void EMS_thread_YGY_entry(void* parameter);
+extern void vEthLinkChkTask(void* parameter);
+
+
 extern struct rt_thread uart7_thread;
 
 extern void uart3_rev_thread_entry(void* parameter);
@@ -76,6 +83,8 @@ void SystemClock_Config(void);
 void rt_hw_board_init(void);
 void SysTick_Handler(void);
 extern void InitGlobalVariables(void);
+unsigned int Float32(unsigned int NumFloat32);
+uint32_t data2hex(uint32_t data) ;
 
 extern struct rt_event com_event;
 #ifdef __cplusplus
